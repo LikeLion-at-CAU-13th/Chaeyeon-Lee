@@ -70,6 +70,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',
+    'config.middleware.RequestLoggingMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -162,3 +163,48 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.User'
+
+#django logging 설정
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': {   # 로그 메시지의 형식을 정의
+        'verbose': {  # 시간, 레벨, 메시지 정보 포함 (메시지에 url 포함)
+            'format': '[{asctime}] {levelname} {message}',
+            'style': '{',
+        },
+    },
+
+    'handlers': {  # 로그를 어디로 출력할지 정의
+        'file': {  # 일반 로그: server.log
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'server.log'),
+            'formatter': 'verbose',
+            'level': 'INFO',
+        },
+        'error_file': {  # 에러 로그: errors.log
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'errors.log'),
+            'formatter': 'verbose',
+            'level': 'WARNING',  # WARNING, ERROR, CRITICAL 레벨 기록
+        },
+    },
+
+    'loggers': { # 실제 로깅을 수행하는 로거 정의
+        # HTTP 요청을 기록하는 로거
+        # 미들웨어에서 사용
+        'custom.http': {  
+            'handlers': ['file', 'error_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        # Django가 잡아주는 에러
+        # 500 에러, 404 에러, CSRF 실패 등 서버 에러 자동 기록
+        'django.request': {  
+            'handlers': ['file', 'error_file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+    }
+}
