@@ -39,7 +39,7 @@ SECRET_KEY = get_secret("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -59,19 +59,34 @@ PROJECT_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-
+    "corsheaders",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', # 반드시 가장 위쪽에 추가
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',
+    'config.middleware.RequestLoggingMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+# 인증 관련 요청(쿠키, 세션 등)을 허용
+# 예를 들어 브라우저가 백엔드 서버로 쿠키를 전송하거나, 백엔드에서 쿠키를 응답으로 보낼 수 있음
+CORS_ALLOW_CREDENTIALS = True
+
+# 서버로 요청 보낼 수 있는 도메인들 정의
+# 여기에서의 localhost는 EC2 인스턴스의 로컬환경이 아니라 프론트엔드 개발 로컬 환경 의미
+# 3000 포트는 프론트엔드 React 애플리케이션의 포트 번호
+# 추후 프론트엔드에서 웹 페이지 배포 후 도메인 매핑했다면 해당 도메인 추가 필요
+CORS_ALLOWED_ORIGINS = [ 
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -148,3 +163,48 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.User'
+
+#django logging 설정
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': {   # 로그 메시지의 형식을 정의
+        'verbose': {  # 시간, 레벨, 메시지 정보 포함 (메시지에 url 포함)
+            'format': '[{asctime}] {levelname} {message}',
+            'style': '{',
+        },
+    },
+
+    'handlers': {  # 로그를 어디로 출력할지 정의
+        'file': {  # 일반 로그: server.log
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'server.log'),
+            'formatter': 'verbose',
+            'level': 'INFO',
+        },
+        'error_file': {  # 에러 로그: errors.log
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'errors.log'),
+            'formatter': 'verbose',
+            'level': 'WARNING',  # WARNING, ERROR, CRITICAL 레벨 기록
+        },
+    },
+
+    'loggers': { # 실제 로깅을 수행하는 로거 정의
+        # HTTP 요청을 기록하는 로거
+        # 미들웨어에서 사용
+        'custom.http': {  
+            'handlers': ['file', 'error_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        # Django가 잡아주는 에러
+        # 500 에러, 404 에러, CSRF 실패 등 서버 에러 자동 기록
+        'django.request': {  
+            'handlers': ['file', 'error_file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+    }
+}
