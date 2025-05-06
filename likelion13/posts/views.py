@@ -5,8 +5,15 @@ from django.views.decorators.http import require_http_methods # 추가
 from .models import *
 import json
 
-# Create your views here.
+from .serializers import PostSerializer
+from .serializers import CommentSerializer
+# APIView를 사용하기 위해 import
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.http import Http404
 
+# Create your views here.
 def hello_world(request):
     if request.method == "GET":
         return JsonResponse({
@@ -17,6 +24,39 @@ def hello_world(request):
 def index(request):
     return render(request, 'index.html')
 
+class PostList(APIView):
+    def post(self, request, format=None):
+        serializer = PostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, format=None):
+        posts = Post.objects.all()
+        # 많은 post들을 받아오려면 (many=True) 써줘야 한다
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data)
+    
+class PostDetail(APIView):
+    def get(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id)
+        serializer = PostSerializer(post)
+        return Response(serializer.data)
+    #put: 데이터 생성 or 전체 수정 - 호환성을 위해 사용
+    def put(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id)
+        serializer = PostSerializer(post, data=request.data)
+        if serializer.is_valid(): #update이니까 유효성 검사 필요요
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id)
+        post.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 @require_http_methods(["GET"])
 def get_post_detail(reqeust, id):
     post = get_object_or_404(Post, pk=id)
@@ -153,6 +193,15 @@ def post_detail(request, post_id):
                 'data': None
         })
     
+
+class CommentList(APIView):
+    def get(self, request, post_id):
+        # post_id에 해당하는 단일 게시글 조회
+        post = get_object_or_404(Post, pk=post_id)
+        # 외래키로 연결된 Comment 모델을 통해 댓글을 가져와서 목록으로 저장
+        comments = post.comment.all()  
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
 
 @require_http_methods(["GET"])
 def post_comment(request, post_id):
