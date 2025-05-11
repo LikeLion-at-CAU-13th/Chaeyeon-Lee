@@ -7,11 +7,14 @@ import json
 
 from .serializers import PostSerializer
 from .serializers import CommentSerializer
+from .serializers import *
 # APIView를 사용하기 위해 import
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .permissions import CombinedPermission
 
 # Create your views here.
 def hello_world(request):
@@ -39,6 +42,8 @@ class PostList(APIView):
         return Response(serializer.data)
     
 class PostDetail(APIView):
+    
+    permission_classes = [IsAuthenticatedOrReadOnly, CombinedPermission]
     def get(self, request, post_id):
         post = get_object_or_404(Post, id=post_id)
         serializer = PostSerializer(post)

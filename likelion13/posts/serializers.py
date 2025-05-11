@@ -1,8 +1,8 @@
 ### Model Serializer case
-
 from rest_framework import serializers
 from .models import Post
 from .models import Comment
+from .models import User
 
 class PostSerializer(serializers.ModelSerializer):
 
