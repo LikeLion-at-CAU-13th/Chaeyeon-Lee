@@ -2,10 +2,8 @@
 from rest_framework import serializers
 from .models import Post
 from .models import Comment
-from .models import User
 
 class PostSerializer(serializers.ModelSerializer):
-
   class Meta:
 		# 어떤 모델을 시리얼라이즈할 건지
     model = Post
