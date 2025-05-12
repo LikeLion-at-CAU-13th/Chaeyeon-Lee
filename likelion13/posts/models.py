@@ -1,5 +1,7 @@
 from django.db import models
 from accounts.models import User
+from django.contrib.auth.models import AbstractUser
+
 # Create your models here.
 # 추상 클래스 정의
 class BaseModel(models.Model):
