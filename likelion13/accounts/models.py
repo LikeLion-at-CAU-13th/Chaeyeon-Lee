@@ -12,4 +12,12 @@ class User(AbstractUser):
             return User.objects.get(username=username)
         except Exception:
             return None
+        
+    # 이메일로 사용자 찾기
+    @staticmethod
+    def get_user_by_email(email):
+        try:
+            return User.objects.get(email=email)
+        except Exception:
+            return None
 
