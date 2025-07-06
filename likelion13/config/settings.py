@@ -97,11 +97,12 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',
-    'config.middleware.RequestLoggingMiddleware',
+    'config.middlewares.RequestLoggingMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "allauth.account.middleware.AccountMiddleware",
+    "config.middlewares.ExceptionHandlerMiddleware",  # 커스텀 예외 처리 미들웨어 추가
 ]
 
 # django-allauth 라이브러리에서 사용하는 옵션
@@ -254,6 +255,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    # 커스텀 예외 처리 함수 지정
+    'EXCEPTION_HANDLER': 'config.custom_exception_handler.custom_exception_handler',
 }
 
 REST_USE_JWT = True

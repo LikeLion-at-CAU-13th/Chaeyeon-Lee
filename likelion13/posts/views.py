@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.http import JsonResponse # 추가 
 from django.shortcuts import get_object_or_404 # 추가
-from django.views.decorators.http import require_http_methods # 추가
+from django.views.decorators.http import require_http_methods
+
+from config.custom_exceptions import * # 커스텀 예외 import 추가
 from .models import *
 import json
 
@@ -34,6 +36,23 @@ def hello_world(request):
 def index(request):
     return render(request, 'index.html')
 
+@require_http_methods(["GET"])
+def get_post_detail(reqeust, id):
+    try:
+        post = Post.objects.get(id=id)
+        post_detail_json = {
+            "id" : post.id,
+            "title" : post.title,
+            "content" : post.content,
+            "status" : post.status,
+            "user" : post.user.username
+        }
+        return JsonResponse({
+            "status" : 200,
+            "data": post_detail_json})
+    except Post.DoesNotExist:
+        raise PostNotFoundException
+
 class PostList(APIView):
     @swagger_auto_schema(
         operation_summary="게시글 생성",
@@ -43,10 +62,10 @@ class PostList(APIView):
     )
     def post(self, request, format=None):
         serializer = PostSerializer(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):  # raise_exception=True로 설정하면 유효성 검사 실패 시 예외 발생
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @swagger_auto_schema(
         operation_summary="게시글 목록 조회",
@@ -112,6 +131,19 @@ class CommentList(APIView):
         comments = post.comment.all()  
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
+    
+    @swagger_auto_schema(
+        operation_summary="댓글 작성",
+        operation_description="post_id에 해당하는 게시글에 댓글을 작성합니다.",
+        request_body=CommentSerializer,
+        responses={201: CommentSerializer, 400: "잘못된 요청"}
+    )
+    def post(self, request, post_id):
+        post = get_object_or_404(Post, pk=post_id)
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(post=post)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 # 카테고리별 게시글 목록 조회
 class CategoryList(APIView):
