@@ -131,6 +131,19 @@ class CommentList(APIView):
         comments = post.comment.all()  
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
+    
+    @swagger_auto_schema(
+        operation_summary="댓글 작성",
+        operation_description="post_id에 해당하는 게시글에 댓글을 작성합니다.",
+        request_body=CommentSerializer,
+        responses={201: CommentSerializer, 400: "잘못된 요청"}
+    )
+    def post(self, request, post_id):
+        post = get_object_or_404(Post, pk=post_id)
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(post=post)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 # 카테고리별 게시글 목록 조회
 class CategoryList(APIView):

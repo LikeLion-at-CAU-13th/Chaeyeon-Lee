@@ -12,7 +12,7 @@ def custom_exception_handler(exc, context):
 def _create_unified_response(response):
     error_detail = _extract_error_detail(response.data)
 
-    return {
+    error_response = {
         'success': False,
         'error': {
             'code': error_detail.get('code', 'DRF-API-ERROR'),
@@ -20,6 +20,14 @@ def _create_unified_response(response):
             'status_code': response.status_code,
         }
     }
+
+    # 14주차 과제1 - 필드별 상세 오류 정보가 있으면 추가
+    if 'errors' in error_detail: # "field: message" 형태로 오류 메시지를 추가
+        error_response['error']['errors'] = error_detail['errors']
+    if 'field_details' in error_detail: # 프론트에서 특정 필드 옆에 오류 메시지 표시할 수 있도록 함
+        error_response['error']['field_details'] = error_detail['field_details']
+
+    return error_response
 
 def _extract_error_detail(error_data):
     print(f"Extracting error detail from: {error_data}")
