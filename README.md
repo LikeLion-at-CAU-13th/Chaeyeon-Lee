@@ -11,7 +11,7 @@
 ![image](https://github.com/user-attachments/assets/813b6259-755c-476e-a613-c9cb410ba061)
 미들웨어 구현 전 오류 화면
 
-![image](https://github.com/user-attachments/assets/1091f0e7-3954-4c3b-85aa-cffc9d304e25)
+![image](https://github.com/user-attachments/assets/240e6d68-2ab2-48d2-84b3-46e095bb057d)
 미들웨어 구현 후 응답
 
 ![image](https://github.com/user-attachments/assets/3da079ae-eee5-4136-9640-ef56326986ac)
