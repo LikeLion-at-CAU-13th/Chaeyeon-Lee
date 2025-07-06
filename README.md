@@ -2,6 +2,43 @@
 **이름** 이채연<br>
 **전공/학년** 소프트웨어학부 3학년<br>
 **파트** 백엔드<br><br>
+
+## 14주차 실습
+
+### 미들웨어를 활용한 Django 내장 예외 처리
+[존재하지 않는 게시글 조회]
+
+![image](https://github.com/user-attachments/assets/813b6259-755c-476e-a613-c9cb410ba061)
+미들웨어 구현 전 오류 화면
+
+![image](https://github.com/user-attachments/assets/1091f0e7-3954-4c3b-85aa-cffc9d304e25)
+미들웨어 구현 후 응답
+
+![image](https://github.com/user-attachments/assets/3da079ae-eee5-4136-9640-ef56326986ac)
+커스텀 예외 처리
+
+### DRF 예외 처리
+![image](https://github.com/user-attachments/assets/d7680f90-1b51-4c44-8676-b4706ea3e3d6)
+예외 처리 전 404 오류 화면
+
+![image](https://github.com/user-attachments/assets/361f57fc-8a3e-4976-9d77-eaea27be2007)
+예외 처리 후 응답
+
+ [이미 존재하는 제목으로 게시글 생성]
+
+![image](https://github.com/user-attachments/assets/b316508c-2420-42f2-9b75-b26b85a74ef9)
+커스텀 예외 처리
+
+## 14주차 과제
+![image](https://github.com/user-attachments/assets/712ba144-8141-455c-be54-4b31b821c3d6)
+[과제 1 - 필드값 없이 게시글 생성 시]
+
+![image](https://github.com/user-attachments/assets/8de619be-7854-49d0-89b9-1b56ef30b24e)
+[과제 2 - 15자 미만 댓글 작성 시]
+
+![image](https://github.com/user-attachments/assets/641246d3-b1aa-45a1-b972-fe22d6951ea7)
+[과제 3 - 하루에 게시글 여러 개 작성 시]
+
 ### 6주차 AWS EC2<br>
 로그 파일 캡쳐본<br>
 **server.log**<br>
